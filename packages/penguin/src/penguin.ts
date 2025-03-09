@@ -1,5 +1,5 @@
-import { Prompt } from "../specialist/ai/context.js";
-import { modelFromString } from "../specialist/ai/models.js";
+import { Prompt } from "@specialist/core/ai/context";
+import { modelFromString } from "@specialist/core/ai/models";
 
 import { tool as createTool } from "ai";
 import { z } from "zod";
@@ -18,7 +18,7 @@ export const penguinNames = createTool({
     const result = [];
 
     for (let i = 0; i < parseInt(count); i++) {
-      result.push(`Penguin ${i}`);
+      result.push(`Penguin ${i}!!`);
     }
 
     return result;

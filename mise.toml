@@ -1,0 +1,60 @@
+[tools]
+node = "latest"
+pnpm = "latest"
+"npm:repomix" = "latest"
+watchexec = "latest"
+
+[hooks]
+
+[env]
+_.path = ['./node_modules/.bin']
+MODEL = 'claude-3.7-sonnet'
+
+[tasks.pnpm-install]
+description = 'Installs dependencies with pnpm'
+run = 'pnpm install'
+sources = ['package.json', 'pnpm-lock.yaml', 'mise.toml']
+outputs = ['node_modules/.pnpm/lock.yaml']
+
+[tasks.dev]
+description = 'Calls your dev script in `package.json`'
+run = 'npm run dev'
+depends = ['pnpm-install']
+
+[tasks.clean]
+description = 'Clears out dist'
+run = 'rm -rf dist/'
+
+[tasks.build]
+description = 'Builds all packages'
+run = 'pnpm build'
+depends = ['pnpm-install','clean']
+
+[tasks.test]
+description = 'Run tests for all packages'
+run = ['pnpm test']
+depends = ['pnpm-install']
+
+[tasks.testwatch-specialist]
+description = 'Runs tests and watches source files, running only related tests'
+run = ['pnpm --filter @specialist/core test:watch']
+depends = ['pnpm-install']
+
+[tasks.testwatch-penguin]
+description = 'Runs penguin tests and watches source files, running only related tests'
+run = ['pnpm --filter @specialist/penguin test:watch']
+depends = ['pnpm-install']
+
+[tasks.llm-dump]
+description = 'Runs repomix'
+run = ['repomix --ignore "**/*.log,tmp/,src/**/*md,src/**/fluximages/**,bin/*"']
+
+[tasks.llm-clipboard]
+description = 'Copies repomix to the clipboard'
+run = [ 'cat repomix-output.txt | pbcopy']
+depends = [ 'llm-dump' ]
+
+[tasks.llm-lint]
+description = 'What does the model think about this'
+run = [ 'cat repomix-output.txt | llm -m claude-3.7-sonnet "$(cat $HOME/prompts/lint)"' ]
+depends = [ 'llm-dump' ]

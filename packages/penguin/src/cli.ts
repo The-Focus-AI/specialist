@@ -1,8 +1,8 @@
-import { chatWithPrompt } from "@/specialist/ai/chat.js";
+import { chatWithPrompt } from "@specialist/core/ai/chat";
 import {
   modelFromString,
   modelStringFromModel,
-} from "@/specialist/ai/models.js";
+} from "@specialist/core/ai/models";
 import { penguinPrompt } from "./penguin.js";
 import childProcess from "child_process";
 async function run() {

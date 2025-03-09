@@ -1,8 +1,8 @@
 import { describe, it, expect } from "@jest/globals";
 import { penguinPrompt, PenguinNamesArgs } from "./penguin.js";
-import { complete, toolCallsFromResult } from "../specialist/ai/complete.js";
-import { makeContext } from "../specialist/ai/context.js";
-import { modelFromString } from "../specialist/ai/models.js";
+import { complete, toolCallsFromResult } from "@specialist/core/ai/complete";
+import { makeContext } from "@specialist/core/ai/context";
+import { modelFromString } from "@specialist/core/ai/models";
 import childProcess from "child_process";
 
 describe("penguin prompt", () => {

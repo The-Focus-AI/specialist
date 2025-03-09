@@ -1,5 +1,5 @@
 import { generateText, GenerateTextResult } from "ai";
-import { Context } from "@/specialist/ai/context.js";
+import { Context } from "./context.js";
 
 export async function complete(
   context: Context,
@@ -14,6 +14,7 @@ export async function complete(
     tools: context.prompt.tools,
     maxSteps: 1,
   });
+
   // console.log("result", result);
   // console.log("complete", result);
   // process.exit(0);

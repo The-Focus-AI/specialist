@@ -1,0 +1,39 @@
+{
+  "name": "@specialist/core",
+  "version": "1.0.0",
+  "description": "Specialist AI core library",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/index.js"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./ai": "./dist/ai/index.js",
+    "./ai/models": "./dist/ai/models.js",
+    "./ai/context": "./dist/ai/context.js",
+    "./ai/chat": "./dist/ai/chat.js",
+    "./ai/complete": "./dist/ai/complete.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ai-sdk/openai": "^1.2.0",
+    "ai": "^4.1.51",
+    "cmd-ts": "^0.13.0",
+    "ollama-ai-provider": "^1.2.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.6"
+  }
+}

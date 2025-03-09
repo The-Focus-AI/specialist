@@ -5,7 +5,6 @@ const config: Config = {
   testEnvironment: "node",
   extensionsToTreatAsEsm: [".ts"],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/specialist/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
   transform: {

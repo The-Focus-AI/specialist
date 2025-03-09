@@ -1,6 +1,6 @@
 import { command, option, restPositionals } from "cmd-ts";
-import { makeContext, makePrompt } from "@/specialist/ai/context.js";
-import { complete } from "@/specialist/ai/complete.js";
+import { makeContext, makePrompt } from "../ai/context.js";
+import { complete } from "../ai/complete.js";
 import { modelStringFromModel } from "../ai/models.js";
 
 export const completeCommand = command({

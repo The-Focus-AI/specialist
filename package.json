@@ -1,17 +1,17 @@
 {
-  "name": "typescript-template",
+  "name": "specialist-monorepo",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Monorepo for specialist and penguin packages",
+  "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "test:coverage": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-    "build": "tsc",
+    "test": "pnpm -r test",
+    "build": "pnpm --filter @specialist/core build && pnpm --filter @specialist/penguin build",
+    "dev:specialist": "pnpm --filter @specialist/core dev",
+    "dev:penguin": "pnpm --filter @specialist/penguin dev",
     "dev": "tsx index.ts",
-    "start": "node dist/index.js",
-    "penguin": "tsx src/penguin/cli.ts"
+    "specialist": "pnpm --filter @specialist/core run dev",
+    "penguin": "pnpm --filter @specialist/penguin run dev"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,7 @@
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.9",
+    "cmd-ts": "^0.13.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
@@ -28,10 +29,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.2.0",
-    "ai": "^4.1.51",
-    "cmd-ts": "^0.13.0",
-    "ollama-ai-provider": "^1.2.0",
-    "zod": "^3.24.2"
+    "@specialist/core": "workspace:*",
+    "@specialist/penguin": "workspace:*"
   }
 }
