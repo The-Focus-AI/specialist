@@ -20,6 +20,7 @@ const config: Config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   rootDir: ".",
   moduleDirectories: ["node_modules", "src"],
+  modulePathIgnorePatterns: ["dist"],
 };
 
 export default config;

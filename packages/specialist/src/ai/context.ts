@@ -6,6 +6,7 @@ import {
   generateText,
 } from "ai";
 import { modelFromString } from "./models.js";
+import { Attachment, attachmentToContent } from "./attachments.js";
 
 export interface Context {
   prompt: Prompt;
@@ -48,7 +49,31 @@ export function makePrompt(
     name: "default",
     system: prompt,
     model: languageModel,
+    prepopulated_questions: [],
+    tools: undefined,
   } as Prompt;
+}
+
+export function addAttachmentToContext(
+  context: Context,
+  attachment: Attachment
+): Context {
+  // Create a copy of the context to avoid mutating the original
+  const newContext = { ...context, messages: [...context.messages] };
+
+  // Add the attachment as a user message
+  newContext.messages.push({
+    role: "user",
+    content: [
+      {
+        type: "text",
+        text: `I've attached a file named ${attachment.filename} for you to analyze.`,
+      },
+      attachmentToContent(attachment),
+    ],
+  });
+
+  return newContext;
 }
 
 export async function complete(

@@ -25,7 +25,7 @@ export const penguinNames = createTool({
   },
 });
 
-export async function penguinPrompt(): Promise<Prompt> {
+export async function penguinPrompt() {
   return {
     name: "penguin",
     system: "You are a penguin expert",

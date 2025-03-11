@@ -6,6 +6,9 @@
   "type": "module",
   "scripts": {
     "test": "pnpm -r test",
+    "test:api": "RUN_API_TESTS=true pnpm -r test",
+    "test:log": "pnpm -r test | tee test-output.log",
+    "test:api:log": "RUN_API_TESTS=true pnpm -r test | tee test-api-output.log",
     "build": "pnpm --filter @specialist/core build && pnpm --filter @specialist/penguin build",
     "dev:specialist": "pnpm --filter @specialist/core dev",
     "dev:penguin": "pnpm --filter @specialist/penguin dev",

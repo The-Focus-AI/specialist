@@ -2,7 +2,6 @@
 node = "latest"
 pnpm = "latest"
 "npm:repomix" = "latest"
-watchexec = "latest"
 
 [hooks]
 
@@ -28,16 +27,41 @@ run = 'rm -rf dist/'
 [tasks.build]
 description = 'Builds all packages'
 run = 'pnpm build'
-depends = ['pnpm-install','clean']
+depends = ['pnpm-install']
 
 [tasks.test]
 description = 'Run tests for all packages'
 run = ['pnpm test']
 depends = ['pnpm-install']
 
+[tasks.test-api]
+description = 'Run tests including API tests (requires OPENAI_API_KEY)'
+run = ['pnpm test:api']
+depends = ['pnpm-install']
+
+[tasks.test-log]
+description = 'Run tests and save output to test-output.log'
+run = ['pnpm test:log']
+depends = ['pnpm-install']
+
+[tasks.test-api-log]
+description = 'Run API tests and save output to test-api-output.log'
+run = ['pnpm test:api:log']
+depends = ['pnpm-install']
+
+[tasks.test-specialist]
+description = 'Runs tests and watches source files, running only related tests'
+run = ['pnpm --filter @specialist/core test']
+depends = ['pnpm-install']
+
 [tasks.testwatch-specialist]
 description = 'Runs tests and watches source files, running only related tests'
 run = ['pnpm --filter @specialist/core test:watch']
+depends = ['pnpm-install']
+
+[tasks.test-penguin]
+description = 'Runs penguin tests and watches source files, running only related tests'
+run = ['pnpm --filter @specialist/penguin test']
 depends = ['pnpm-install']
 
 [tasks.testwatch-penguin]

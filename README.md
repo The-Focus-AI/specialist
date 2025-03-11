@@ -23,10 +23,58 @@ pnpm install
 pnpm build
 ```
 
-### Run tests for all packages
+### Testing
+
+#### Regular Tests
 
 ```bash
+# Run all tests
 pnpm test
+# or
+mise run test
+
+# Run specific package tests
+pnpm --filter @specialist/core test
+pnpm --filter @specialist/penguin test
+# or
+mise run test-specialist
+mise run test-penguin
+```
+
+#### API Tests
+
+The project includes API integration tests that require an OpenAI API key. These tests are skipped by default and are located in files ending with `.api.test.ts`.
+
+To run API tests:
+
+```bash
+# Set your API key
+export OPENAI_API_KEY=your_api_key_here
+
+# Run all tests including API tests
+pnpm test:api
+# or
+mise run test-api
+```
+
+API test results are saved in `tests_output/` directory for reference and debugging. This is especially useful since API calls can be expensive and time-consuming, so you don't need to re-run tests to see the results.
+
+For CI environments, leave the tests in skip mode by not setting the `RUN_API_TESTS` environment variable.
+
+#### Test Logging
+
+To save test output to a log file:
+
+```bash
+# Save regular test output to test-output.log
+pnpm test:log
+# or
+mise run test-log
+
+# Save API test output to test-api-output.log
+pnpm test:api:log
+# or
+mise run test-api-log
 ```
 
 ### Running specific packages
