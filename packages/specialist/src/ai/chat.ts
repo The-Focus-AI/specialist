@@ -6,6 +6,9 @@ import { createAttachment } from "./attachments.js";
 import fs from "fs-extra";
 import path from "path";
 
+import { trackUsage } from "./usage.js";
+import { modelStringFromModel } from "./models.js";
+
 export async function generate(
   context: Context,
   message: string,
@@ -43,6 +46,8 @@ export async function generate(
   }
 
   let runError: any;
+  let usageData: any = null;
+  const startTime = Date.now();
 
   const result = streamText({
     model: newContext.prompt.model,
@@ -81,6 +86,10 @@ export async function generate(
 
         console.log("finishReason", finishReason);
       }
+      
+      // Save usage data for tracking
+      usageData = usage;
+      
       if (finishReason == "stop") {
         newContext.messages.push({ role: "assistant", content: text });
       } else if (finishReason == "tool-calls") {
@@ -117,6 +126,26 @@ export async function generate(
   if (runError) {
     throw runError;
   }
+  
+  // Update context usage stats
+  if (usageData) {
+    newContext.usage.promptTokens += usageData.promptTokens || 0;
+    newContext.usage.completionTokens += usageData.completionTokens || 0;
+    newContext.usage.totalTokens += usageData.totalTokens || 0;
+    newContext.usage.calls += 1;
+  }
+
+  // Track global usage
+  const duration = Date.now() - startTime;
+  await trackUsage({
+    timestamp: new Date().toISOString(),
+    model: modelStringFromModel(newContext.prompt.model),
+    operation: 'stream',
+    promptTokens: usageData?.promptTokens,
+    completionTokens: usageData?.completionTokens,
+    totalTokens: usageData?.totalTokens,
+    duration
+  });
 
   return newContext;
 }

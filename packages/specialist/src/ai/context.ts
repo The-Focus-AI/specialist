@@ -8,9 +8,17 @@ import {
 import { modelFromString } from "./models.js";
 import { Attachment, attachmentToContent } from "./attachments.js";
 
+export interface UsageStats {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  calls: number;
+}
+
 export interface Context {
   prompt: Prompt;
   messages: CoreMessage[];
+  usage: UsageStats;
 }
 
 export interface Prompt {
@@ -32,7 +40,13 @@ export function makeContext(prompt: Prompt): Context {
   return {
     prompt,
     messages,
-  } as Context;
+    usage: {
+      promptTokens: 0,
+      completionTokens: 0, 
+      totalTokens: 0,
+      calls: 0
+    }
+  };
 }
 
 export function makePrompt(
@@ -58,8 +72,12 @@ export function addAttachmentToContext(
   context: Context,
   attachment: Attachment
 ): Context {
-  // Create a copy of the context to avoid mutating the original
-  const newContext = { ...context, messages: [...context.messages] };
+  // Create a deep copy of the context to avoid mutating the original
+  const newContext = { 
+    ...context, 
+    messages: [...context.messages],
+    usage: { ...context.usage }
+  };
 
   // Add the attachment as a user message
   newContext.messages.push({

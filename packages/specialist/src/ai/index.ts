@@ -6,6 +6,7 @@ export {
 export * from './chat.js';
 export * from './complete.js';
 export * from './attachments.js';
+export * from './usage.js';
 
 // Export test utilities
 export * from './test-utils.js';

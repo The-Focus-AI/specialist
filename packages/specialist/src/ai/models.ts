@@ -2,6 +2,8 @@ import { openai } from "@ai-sdk/openai";
 
 import { createOpenAI } from "@ai-sdk/openai";
 import { ollama } from "ollama-ai-provider";
+import { mistral } from "@ai-sdk/mistral";
+import { anthropic } from "@ai-sdk/anthropic";
 
 import { LanguageModel } from "ai";
 
@@ -11,6 +13,10 @@ export function modelFromString(modelString: string): LanguageModel {
     return ollama(model);
   } else if (provider === "openai") {
     return openai(model);
+  } else if (provider === "mistral") {
+    return mistral(model);
+  } else if (provider === "anthropic") {
+    return anthropic(model);
   } else if (provider === "groq") {
     const groq = createOpenAI({
       baseURL: "https://api.groq.com/openai/v1",
