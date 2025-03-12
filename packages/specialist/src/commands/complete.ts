@@ -10,7 +10,7 @@ export const completeCommand = command({
       long: "model",
       short: "m",
       description: "The model to use",
-      defaultValue: () => "ollama/llama3.2",
+      defaultValue: () => "ollama/qwen2.5",
     }),
     prompt: restPositionals({
       description: "The prompt to use",

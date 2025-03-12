@@ -83,6 +83,3 @@ description = 'What does the model think about this'
 run = [ 'cat repomix-output.txt | llm -m claude-3.7-sonnet "$(cat $HOME/prompts/lint)"' ]
 depends = [ 'llm-dump' ]
 
-[tasks.commit-message]
-description = 'Writes a commit message'
-run = [ 'git diff | llm -m claude-3.7-sonnet "$(cat $HOME/prompts/git-commit-message)"' ]

@@ -5,7 +5,7 @@ import os from "os";
 export interface UsageData {
   timestamp: string;
   model: string;
-  operation: "complete" | "stream" | "generate";
+  operation: "complete" | "stream" | "generate" | "stream-with-memory" | "memory-extract-facts" | "memory-determine-ops";
   promptTokens?: number;
   completionTokens?: number;
   totalTokens?: number;

@@ -1,31 +1,31 @@
-import { Command } from "commander";
+import { command } from "cmd-ts";
 import { getUsageStats } from "../ai/usage.js";
-import chalk from "chalk";
 
-export const usage = new Command()
-  .name("usage")
-  .description("Display AI usage statistics")
-  .action(async () => {
+export const usageCommand = command({
+  name: "usage",
+  description: "Display AI usage statistics",
+  args: {},
+  handler: async () => {
     try {
       const stats = await getUsageStats();
       
-      console.log(chalk.bold("\nAI Usage Statistics\n"));
+      console.log("\nAI Usage Statistics\n");
       
       // Total usage
-      console.log(chalk.cyan("Total Calls:"), stats.totalCalls);
-      console.log(chalk.cyan("Total Tokens:"), stats.totalTokens);
+      console.log("Total Calls:", stats.totalCalls);
+      console.log("Total Tokens:", stats.totalTokens);
       
       // Breakdown by model
-      console.log(chalk.cyan("\nUsage by Model:"));
+      console.log("\nUsage by Model:");
       Object.entries(stats.callsByModel).forEach(([model, count]) => {
         const tokens = stats.tokensByModel[model] || 0;
-        console.log(`  ${chalk.yellow(model)}: ${count} calls, ${tokens} tokens`);
+        console.log(`  ${model}: ${count} calls, ${tokens} tokens`);
       });
       
       // Breakdown by operation
-      console.log(chalk.cyan("\nUsage by Operation:"));
+      console.log("\nUsage by Operation:");
       Object.entries(stats.callsByOperation).forEach(([op, count]) => {
-        console.log(`  ${chalk.yellow(op)}: ${count} calls`);
+        console.log(`  ${op}: ${count} calls`);
       });
       
       console.log(); // Empty line at the end
@@ -33,4 +33,5 @@ export const usage = new Command()
       console.error("Failed to retrieve usage statistics:", error);
       process.exit(1);
     }
-  });
+  }
+});

@@ -7,3 +7,6 @@ coverage/
 *-output.log
 test-*.log
 tests_output/
+*tsbuildinfo
+
+docs/*
