@@ -11,7 +11,7 @@ import os from "os";
 
 import { trackUsage } from "./usage.js";
 import { modelStringFromModel } from "./models.js";
-
+import { addFileToContext } from "./file.js";
 export async function generate(
   context: Context,
   message: string,
@@ -299,27 +299,15 @@ const terminal = readline.createInterface({
  * @param prompt The prompt to use
  * @param memoryConfig Optional memory configuration (if using memory)
  */
-export async function interactiveChat(
-  prompt: Prompt,
-  memoryConfig?: Partial<MemoryConfig>
-) {
-  console.log(
-    `Starting ${memoryConfig ? "memory-enabled" : "standard"} chat...`
-  );
+export async function interactiveChat(context: Context | MemoryContext) {
+  let useMemory = false;
+  if (context instanceof MemoryContext) {
+    console.log(`Starting memory-enabled chat...`);
+    useMemory = true;
+  }
 
   try {
-    // Create context based on whether memory is enabled
-    const useMemory = !!memoryConfig;
-    let context: Context | MemoryContext;
-
-    if (useMemory) {
-      context = new MemoryContext(prompt, memoryConfig);
-      console.log("Memory storage:", memoryConfig.storage_path || "default");
-    } else {
-      context = new Context(prompt);
-    }
-
-    console.log("Model:", modelStringFromModel(prompt.model));
+    console.log("Model:", modelStringFromModel(context.prompt.model));
     console.log(`Chat session started. Type 'q' to quit, '?' to see context.`);
 
     if (useMemory) {
@@ -332,9 +320,10 @@ export async function interactiveChat(
       "To attach files, type 'file:' followed by the absolute path, e.g.:"
     );
     console.log("file:/path/to/document.pdf");
+    console.log();
 
     while (true) {
-      const response = await terminal.question(`${prompt.name}> `);
+      const response = await terminal.question(`${context.prompt.name}> `);
 
       if (response === "q") {
         break;
@@ -367,6 +356,16 @@ export async function interactiveChat(
           console.log("You said:", response);
         } else {
           console.log(`Processing file: ${response.substring(5).trim()}`);
+          const filePath = response.substring(5).trim();
+
+          const attachment = await createAttachment(filePath);
+
+          context = await context.addFileMessage(
+            attachment.base64Data,
+            attachment.mimeType,
+            attachment.filename
+          );
+          console.log("File added to context");
         }
 
         try {
@@ -379,7 +378,7 @@ export async function interactiveChat(
             // Enrich with memories if applicable
             context = await (
               context as MemoryContext
-            ).enrichContextWithMemories();
+            ).enrichContextWithMemories(response);
           } else {
             context = await context.addUserMessage(response);
           }
@@ -417,21 +416,4 @@ export async function interactiveChat(
   } catch (error) {
     console.error("Fatal error in chat:", error);
   }
-}
-
-// Legacy wrapper functions for backward compatibility
-export async function chatWithPrompt(prompt: Prompt) {
-  return interactiveChat(prompt);
-}
-
-export async function chatWithMemory(
-  prompt: Prompt,
-  memoryConfig?: Partial<MemoryConfig>
-) {
-  return interactiveChat(
-    prompt,
-    memoryConfig || {
-      storage_path: path.join(os.homedir(), ".specialist", "memories"),
-    }
-  );
 }

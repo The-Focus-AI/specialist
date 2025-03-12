@@ -1,10 +1,9 @@
-import { chatWithPrompt } from "@specialist/core/ai/chat";
-import {
-  modelFromString,
-  modelStringFromModel,
-} from "@specialist/core/ai/models";
+import { Context } from "@specialist/core/ai/context";
 import { penguinPrompt } from "./penguin.js";
 import childProcess from "child_process";
+import { modelStringFromModel } from "@specialist/core/ai/models";
+import { interactiveChat } from "@specialist/core/ai/chat";
+
 async function run() {
   if (!process.env.OPENAI_API_KEY) {
     const cmd = 'op read "op://Development/OpenAI Key/notesPlain"';
@@ -15,10 +14,10 @@ async function run() {
   }
 
   const runningPrompt = await penguinPrompt();
-  runningPrompt.model = modelFromString("openai/gpt-4o");
+  const context = new Context(runningPrompt);
   console.log("[Model]", modelStringFromModel(runningPrompt.model));
   console.log("[Prompt]", runningPrompt.system);
-  const result = await chatWithPrompt(runningPrompt);
+  const result = await interactiveChat(context);
   console.log(result);
 }
 

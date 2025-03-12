@@ -5,7 +5,13 @@ import os from "os";
 export interface UsageData {
   timestamp: string;
   model: string;
-  operation: "complete" | "stream" | "generate" | "stream-with-memory" | "memory-extract-facts" | "memory-determine-ops";
+  operation:
+    | "complete"
+    | "stream"
+    | "generate"
+    | "stream-with-memory"
+    | "memory-extract-facts"
+    | "memory-determine-ops";
   promptTokens?: number;
   completionTokens?: number;
   totalTokens?: number;
@@ -56,8 +62,12 @@ export async function trackUsage(data: UsageData): Promise<void> {
     let usageLog: UsageData[] = [];
 
     if (await fs.pathExists(file)) {
-      const content = await fs.readFile(file, "utf-8");
-      usageLog = JSON.parse(content);
+      try {
+        const content = await fs.readFile(file, "utf-8");
+        usageLog = JSON.parse(content);
+      } catch (error) {
+        console.error("Failed to parse usage log:", error);
+      }
     }
 
     usageLog.push(data);
@@ -115,21 +125,21 @@ export async function getUsageStats(): Promise<UsageStats> {
         }
         stats.tokensByModel[entry.model] += entry.totalTokens;
       }
-      
+
       // Count prompt tokens if available
       if (entry.promptTokens) {
         stats.totalPromptTokens += entry.promptTokens;
-        
+
         if (!stats.promptTokensByModel[entry.model]) {
           stats.promptTokensByModel[entry.model] = 0;
         }
         stats.promptTokensByModel[entry.model] += entry.promptTokens;
       }
-      
+
       // Count completion tokens if available
       if (entry.completionTokens) {
         stats.totalCompletionTokens += entry.completionTokens;
-        
+
         if (!stats.completionTokensByModel[entry.model]) {
           stats.completionTokensByModel[entry.model] = 0;
         }

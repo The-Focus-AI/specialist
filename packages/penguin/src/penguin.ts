@@ -25,11 +25,11 @@ export const penguinNames = createTool({
   },
 });
 
-export async function penguinPrompt() {
+export async function penguinPrompt(): Promise<Prompt> {
   return {
     name: "penguin",
     system: "You are a penguin expert",
-    model: modelFromString("ollama/llama3.2"),
+    model: modelFromString("ollama/qwen2.5"),
     prepopulated_questions: [],
     tools: { penguinNames },
   };

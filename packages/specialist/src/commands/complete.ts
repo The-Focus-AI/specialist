@@ -15,8 +15,14 @@ export const completeCommand = command({
       description: "The prompt to use",
       displayName: "prompt",
     }),
+    file: option({
+      long: "file",
+      short: "f",
+      description: "The file to use",
+      defaultValue: () => "",
+    }),
   },
-  handler: async ({ prompt, model }) => {
+  handler: async ({ prompt, model, file }) => {
     const runningPrompt = makePrompt(prompt.join(" "), model);
     console.log("[Model]", modelStringFromModel(runningPrompt.model));
     console.log("[Prompt]", runningPrompt.system);

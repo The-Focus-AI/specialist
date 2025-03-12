@@ -36,6 +36,14 @@ describe("DetermineOperationsSpecialist with Ollama", () => {
         updated_at: new Date().toISOString(),
         user_id: "test-user",
       },
+      {
+        id: "mem-3",
+        memory: "Email is john@example.com",
+        hash: "hash3",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        user_id: "test-user",
+      },
     ];
 
     jest.setTimeout(60000); // Increase timeout for Ollama calls

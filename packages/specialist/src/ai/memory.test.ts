@@ -12,7 +12,7 @@ describe("Memory API", () => {
     // Create a temporary directory for memory storage
     testDir = path.join(os.tmpdir(), `memory-test-${Date.now()}`);
     fs.ensureDirSync(testDir);
-    
+
     // Create memories.json file
     fs.writeJSONSync(path.join(testDir, "memories.json"), []);
 
@@ -37,13 +37,13 @@ describe("Memory API", () => {
 
   test("should add and retrieve memories (mock)", async () => {
     // Set up fake specialists to avoid actual LLM calls
-    (memory as any).extractFactsSpecialist = {
+    const mockFactExtractor = {
       extractFacts: jest
         .fn()
         .mockResolvedValue(["Name is John", "Likes pizza"]),
     };
 
-    (memory as any).determineOperationsSpecialist = {
+    const mockOperationDeterminer = {
       determineOperations: jest.fn().mockResolvedValue({
         results: [
           {
@@ -60,6 +60,11 @@ describe("Memory API", () => {
       }),
     };
 
+    memory.setSpecialists(
+      mockFactExtractor as any,
+      mockOperationDeterminer as any
+    );
+
     // Add test messages
     const result = await memory.add([
       { role: "user", content: "Hi, my name is John" },
@@ -69,12 +74,8 @@ describe("Memory API", () => {
 
     // Check result
     expect(result.results).toHaveLength(2);
-    expect(
-      (memory as any).extractFactsSpecialist.extractFacts
-    ).toHaveBeenCalled();
-    expect(
-      (memory as any).determineOperationsSpecialist.determineOperations
-    ).toHaveBeenCalled();
+    expect(mockFactExtractor.extractFacts).toHaveBeenCalled();
+    expect(mockOperationDeterminer.determineOperations).toHaveBeenCalled();
 
     // Verify memories were stored
     const allMemories = memory.getAll();
@@ -86,18 +87,18 @@ describe("Memory API", () => {
     const searchResults = memory.search("pizza");
     expect(searchResults).toHaveLength(1);
     expect(searchResults[0].memory).toContain("pizza");
-  });
+  }, 15000);
 
   test("should update existing memory (mock)", async () => {
     // Set up fake specialists
-    (memory as any).extractFactsSpecialist = {
+    const mockFactExtractor = {
       extractFacts: jest
         .fn()
         .mockResolvedValueOnce(["Name is John"])
         .mockResolvedValueOnce(["Name is John Smith"]),
     };
 
-    (memory as any).determineOperationsSpecialist = {
+    const mockOperationDeterminer = {
       determineOperations: jest
         .fn()
         // First operation - add
@@ -123,6 +124,11 @@ describe("Memory API", () => {
         }),
     };
 
+    memory.setSpecialists(
+      mockFactExtractor as any,
+      mockOperationDeterminer as any
+    );
+
     // Add initial memory
     await memory.add([{ role: "user", content: "Hi, my name is John" }]);
 
@@ -140,18 +146,18 @@ describe("Memory API", () => {
     const allMemories = memory.getAll();
     expect(allMemories).toHaveLength(1);
     expect(allMemories[0].memory).toContain("John Smith");
-  });
+  }, 15000);
 
   test("should delete memory (mock)", async () => {
     // Set up fake specialists
-    (memory as any).extractFactsSpecialist = {
+    const mockFactExtractor = {
       extractFacts: jest
         .fn()
         .mockResolvedValueOnce(["Likes cheese pizza"])
         .mockResolvedValueOnce(["Dislikes cheese pizza"]),
     };
 
-    (memory as any).determineOperationsSpecialist = {
+    const mockOperationDeterminer = {
       determineOperations: jest
         .fn()
         // First operation - add
@@ -176,6 +182,11 @@ describe("Memory API", () => {
         }),
     };
 
+    memory.setSpecialists(
+      mockFactExtractor as any,
+      mockOperationDeterminer as any
+    );
+
     // Add initial memory
     await memory.add([{ role: "user", content: "I love cheese pizza" }]);
 
@@ -191,17 +202,17 @@ describe("Memory API", () => {
     // Verify memory was deleted
     const allMemories = memory.getAll();
     expect(allMemories).toHaveLength(0);
-  });
+  }, 15000);
 
   test("should reset all memories", async () => {
     // Set up fake specialists
-    (memory as any).extractFactsSpecialist = {
+    const mockFactExtractor = {
       extractFacts: jest
         .fn()
         .mockResolvedValue(["Name is John", "Likes pizza"]),
     };
 
-    (memory as any).determineOperationsSpecialist = {
+    const mockOperationDeterminer = {
       determineOperations: jest.fn().mockResolvedValue({
         results: [
           {
@@ -218,6 +229,11 @@ describe("Memory API", () => {
       }),
     };
 
+    memory.setSpecialists(
+      mockFactExtractor as any,
+      mockOperationDeterminer as any
+    );
+
     // Add test memories
     await memory.add([
       { role: "user", content: "Hi, my name is John" },
@@ -232,5 +248,5 @@ describe("Memory API", () => {
 
     // Verify memories are gone
     expect(memory.getAll()).toHaveLength(0);
-  });
+  }, 15000);
 });

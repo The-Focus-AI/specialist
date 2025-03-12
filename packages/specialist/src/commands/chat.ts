@@ -1,12 +1,9 @@
 import { command, option, restPositionals, flag } from "cmd-ts";
-import {
-  Context,
-  makePrompt,
-} from "../ai/context.js";
+import { Context, makePrompt } from "../ai/context.js";
 import { interactiveChat } from "../ai/chat.js";
 import { modelStringFromModel } from "../ai/models.js";
-import { createAttachment } from "../ai/attachments.js";
-import fs from "fs-extra";
+import { MemoryContext } from "src/ai/memory-context.js";
+import { addFileToContext } from "src/ai/file.js";
 import path from "path";
 
 export const chatCommand = command({
@@ -49,36 +46,18 @@ export const chatCommand = command({
       console.log("[Memory] Enabled");
     }
 
-    // Set up memory config if memory is enabled
-    const memoryConfig = memory ? { storage_path: memoryPath } : undefined;
+    let context = new Context(runningPrompt);
+    if (memory) {
+      const memoryConfig = { storage_path: memoryPath };
+
+      context = new MemoryContext(runningPrompt, memoryConfig);
+    }
 
     if (file) {
-      const filePath = path.resolve(file);
-      if (await fs.pathExists(filePath)) {
-        console.log(`[File] ${filePath}`);
-        // Initialize context with the file
-        const context = new Context(runningPrompt);
-        try {
-          // Create attachment from file
-          const attachment = await createAttachment(filePath);
-          // Add attachment to context
-          const updatedContext = await context.addAttachment(attachment);
-
-          // Start interactive chat with the file-enhanced context
-          await interactiveChat(updatedContext.prompt, memoryConfig);
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          console.error(`Error processing file: ${errorMessage}`);
-          process.exit(1);
-        }
-      } else {
-        console.error(`File not found: ${filePath}`);
-        process.exit(1);
-      }
-    } else {
-      // Start interactive chat (with or without memory)
-      await interactiveChat(runningPrompt, memoryConfig);
+      await addFileToContext(context, file);
     }
+
+    // Start interactive chat (with or without memory)
+    await interactiveChat(context);
   },
 });

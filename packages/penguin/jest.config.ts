@@ -18,7 +18,7 @@ const config: Config = {
           esModuleInterop: true,
           module: "NodeNext",
           moduleResolution: "NodeNext",
-          rootDir: "../../"
+          rootDir: "../../",
         },
       },
     ],

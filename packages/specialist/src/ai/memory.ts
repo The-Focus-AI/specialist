@@ -82,6 +82,19 @@ export class Memory {
   }
 
   /**
+   * Set specialists for testing purposes
+   * @param factExtractor The fact extraction specialist
+   * @param operationDeterminer The operation determination specialist
+   */
+  public setSpecialists(
+    factExtractor: ExtractFactsSpecialist,
+    operationDeterminer: DetermineOperationsSpecialist
+  ): void {
+    this.factExtractor = factExtractor;
+    this.operationDeterminer = operationDeterminer;
+  }
+
+  /**
    * Load memories from storage
    */
   private loadMemories(): void {
@@ -161,34 +174,52 @@ export class Memory {
         const now = new Date().toISOString();
 
         switch (op.event) {
-          case "ADD":
-            this.memories.set(op.id, {
-              id: op.id,
+          case "ADD": {
+            const newId = this.generateUUID();
+            const newMemory: MemoryItem = {
+              id: newId,
               memory: op.memory,
               hash: this.generateHash(op.memory),
               created_at: now,
               updated_at: now,
               user_id: userId,
-            });
+            };
+            this.memories.set(newId, newMemory);
+            op.id = newId; // Update the operation ID to match the new UUID
             break;
+          }
 
-          case "UPDATE":
-            if (op.id && this.memories.has(op.id)) {
-              const existing = this.memories.get(op.id)!;
-              this.memories.set(op.id, {
-                ...existing,
+          case "UPDATE": {
+            // Find the memory to update by matching content
+            const memoryToUpdate = Array.from(this.memories.values()).find(
+              (m) => m.memory === op.previous_memory
+            );
+
+            if (memoryToUpdate) {
+              const updatedMemory: MemoryItem = {
+                ...memoryToUpdate,
                 memory: op.memory,
                 hash: this.generateHash(op.memory),
                 updated_at: now,
-              });
+              };
+              this.memories.set(memoryToUpdate.id, updatedMemory);
+              op.id = memoryToUpdate.id; // Update the operation ID to match the existing UUID
             }
             break;
+          }
 
-          case "DELETE":
-            if (op.id) {
-              this.memories.delete(op.id);
+          case "DELETE": {
+            // Find the memory to delete by matching content
+            const memoryToDelete = Array.from(this.memories.values()).find(
+              (m) => m.memory === op.memory
+            );
+
+            if (memoryToDelete) {
+              this.memories.delete(memoryToDelete.id);
+              op.id = memoryToDelete.id; // Update the operation ID to match the deleted UUID
             }
             break;
+          }
         }
       }
 

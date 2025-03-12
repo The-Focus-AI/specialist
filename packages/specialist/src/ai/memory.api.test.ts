@@ -1,3 +1,5 @@
+// TODO: This hits ollama, we should consider using mocks for this
+
 import {
   describe,
   expect,
@@ -161,18 +163,18 @@ describe("Memory System Core Tests", () => {
       hash: "abc123",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      user_id: "test-user"
+      user_id: "test-user",
     };
-    
+
     const testMemory2 = {
       id: "memory-2",
       memory: "John likes pizza",
       hash: "def456",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      user_id: "test-user"
+      user_id: "test-user",
     };
-    
+
     // Add the memories directly
     (memory as any).memories.set(testMemory1.id, testMemory1);
     (memory as any).memories.set(testMemory2.id, testMemory2);
@@ -203,18 +205,18 @@ describe("Memory System Core Tests", () => {
       hash: "abc123",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      user_id: "user-1"
+      user_id: "user-1",
     };
-    
+
     const testMemory2 = {
       id: "memory-2",
       memory: "Alice is a software engineer",
       hash: "def456",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      user_id: "user-2"
+      user_id: "user-2",
     };
-    
+
     // Add the memories directly
     (memory as any).memories.set(testMemory1.id, testMemory1);
     (memory as any).memories.set(testMemory2.id, testMemory2);
@@ -275,9 +277,9 @@ describe("MemoryContext Integration Tests", () => {
 
   test("should add user messages and extract facts", async () => {
     // Add a user message
-    memoryContext = await memoryContext.addUserMessage(
+    memoryContext = (await memoryContext.addUserMessage(
       "I love pizza and want to visit Italy someday"
-    ) as MemoryContext;
+    )) as MemoryContext;
 
     // Verify message was added to context
     const messages = memoryContext.getMessages();
@@ -292,13 +294,13 @@ describe("MemoryContext Integration Tests", () => {
 
     // Verify that facts were extracted and stored
     const memories = memoryContext.getMemories();
-    
+
     // Skip assertions if no memories were created (common in CI)
     if (memories.length === 0) {
       console.log("No memories were generated - skipping detailed checks");
       return;
     }
-    
+
     expect(memories.length).toBeGreaterThan(0);
 
     // Check for extracted memories
@@ -312,24 +314,22 @@ describe("MemoryContext Integration Tests", () => {
 
   test("should add assistant responses to memory", async () => {
     // Add assistant response
-    memoryContext = await memoryContext.addAssistantResponse(
+    memoryContext = (await memoryContext.addAssistantResponse(
       "I can help you plan your trip to Italy!"
-    ) as MemoryContext;
+    )) as MemoryContext;
 
     // Verify message was added to context
     const messages = memoryContext.getMessages();
     expect(messages.length).toBe(2); // System + assistant message
     expect(messages[1].role).toBe("assistant");
-    expect(messages[1].content).toBe(
-      "I can help you plan your trip to Italy!"
-    );
+    expect(messages[1].content).toBe("I can help you plan your trip to Italy!");
   });
 
   test("should enrich context with memories", async () => {
     // First add a message to generate some memories
-    memoryContext = await memoryContext.addUserMessage(
+    memoryContext = (await memoryContext.addUserMessage(
       "My name is John and I like programming"
-    ) as MemoryContext;
+    )) as MemoryContext;
 
     // Give the LLM time to process
     await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -344,9 +344,9 @@ describe("MemoryContext Integration Tests", () => {
         hash: "abc123",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        user_id: (memoryContext as any).sessionId
+        user_id: (memoryContext as any).sessionId,
       };
-      
+
       // Add the memory directly
       (memoryContext as any).memory.memories.set(testMemory.id, testMemory);
     }
@@ -370,12 +370,12 @@ describe("MemoryContext Integration Tests", () => {
       hash: "abc123",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      user_id: sessionId
+      user_id: sessionId,
     };
-    
+
     // Add the memory directly
     (memoryContext as any).memory.memories.set(testMemory.id, testMemory);
-    
+
     // Verify memory exists
     expect(memoryContext.getMemories().length).toBeGreaterThan(0);
 
@@ -402,9 +402,9 @@ describe("MemoryContext Integration Tests", () => {
       hash: "abc123",
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      user_id: sessionId
+      user_id: sessionId,
     };
-    
+
     // Add the memory directly
     (memoryContext as any).memory.memories.set(testMemory.id, testMemory);
     (memoryContext as any).memory.saveMemories();
@@ -457,23 +457,23 @@ describe("Memory System Workflow Tests", () => {
 
     // Simulate a conversation with multiple turns
     // Turn 1: User introduces themselves
-    memoryContext = await memoryContext.addUserMessage(
+    memoryContext = (await memoryContext.addUserMessage(
       "Hi there! My name is Alex and I'm from California."
-    ) as MemoryContext;
-    memoryContext = await memoryContext.addAssistantResponse(
+    )) as MemoryContext;
+    memoryContext = (await memoryContext.addAssistantResponse(
       "Nice to meet you, Alex! How can I help you today?"
-    ) as MemoryContext;
+    )) as MemoryContext;
 
     // // Give the LLM time to process
     // await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Turn 2: User shares preferences
-    memoryContext = await memoryContext.addUserMessage(
+    memoryContext = (await memoryContext.addUserMessage(
       "I love pizza and coffee. I'm planning to move to New York soon."
-    ) as MemoryContext;
-    memoryContext = await memoryContext.addAssistantResponse(
+    )) as MemoryContext;
+    memoryContext = (await memoryContext.addAssistantResponse(
       "That's exciting! New York has great pizza and coffee shops."
-    ) as MemoryContext;
+    )) as MemoryContext;
 
     // // Give the LLM time to process
     // await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -519,6 +519,9 @@ describe("Memory System Workflow Tests", () => {
     }
 
     expect(factCount).toBeGreaterThanOrEqual(2);
+
+    memoryContext =
+      (await memoryContext.enrichContextWithMemories()) as MemoryContext;
 
     // Check that the context was enriched with memories
     const messages = memoryContext.getMessages();
