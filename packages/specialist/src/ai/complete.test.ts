@@ -1,8 +1,14 @@
 import { describe, it, expect } from "@jest/globals";
-import { complete } from "./complete.js";
+import { Context, makePrompt } from "./context.js";
+import { modelFromString } from "./models.js";
 
-describe("complete command", () => {
+describe("Context complete method", () => {
   it("should be defined", () => {
-    expect(complete).toBeDefined();
+    // Use modelFromString which is already properly typed
+    const model = modelFromString("ollama/llama3.2");
+    const prompt = makePrompt("Test prompt", model);
+    const context = new Context(prompt);
+    
+    expect(context.complete).toBeDefined();
   });
 });

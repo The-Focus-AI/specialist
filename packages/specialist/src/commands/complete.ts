@@ -1,6 +1,5 @@
 import { command, option, restPositionals } from "cmd-ts";
-import { makeContext, makePrompt } from "../ai/context.js";
-import { complete } from "../ai/complete.js";
+import { Context, makePrompt } from "../ai/context.js";
 import { modelStringFromModel } from "../ai/models.js";
 
 export const completeCommand = command({
@@ -22,8 +21,9 @@ export const completeCommand = command({
     console.log("[Model]", modelStringFromModel(runningPrompt.model));
     console.log("[Prompt]", runningPrompt.system);
 
-    const context = makeContext(runningPrompt);
-    const result = await complete(context, prompt.join(" "));
+    const context = new Context(runningPrompt);
+    const contextWithPrompt = await context.addUserMessage(prompt.join(" "));
+    const result = await contextWithPrompt.complete();
     console.log(result);
   },
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeAll } from "@jest/globals";
 import { createAttachment } from "./attachments.js";
-import { addAttachmentToContext, complete, makeContext, makePrompt } from "./context.js";
+import { Context, makePrompt } from "./context.js";
 import { requiresEnv, saveTestResult } from "./test-utils.js";
 import path from "path";
 import fs from "fs-extra";
@@ -51,13 +51,13 @@ const runApiTests = process.env.RUN_API_TESTS === "true";
     
     // Create a context with OpenAI model
     const prompt = makePrompt("Describe what you see in this image in detail", "openai/gpt-4o");
-    const context = makeContext(prompt);
+    const context = new Context(prompt);
     
     // Add the image to the context
-    const updatedContext = addAttachmentToContext(context, attachment);
+    const updatedContext = await context.addAttachment(attachment);
     
     // Call the API
-    const result = await complete(updatedContext);
+    const result = await updatedContext.complete();
     
     // Verify we got a meaningful response
     expect(result.text).toBeDefined();
@@ -91,13 +91,13 @@ const runApiTests = process.env.RUN_API_TESTS === "true";
     
     // Create a context with Anthropic model
     const prompt = makePrompt("What's in this image? Describe it in detail.", "anthropic/claude-3-opus-20240229");
-    const context = makeContext(prompt);
+    const context = new Context(prompt);
     
     // Add the image to the context
-    const updatedContext = addAttachmentToContext(context, attachment);
+    const updatedContext = await context.addAttachment(attachment);
     
     // Call the API
-    const result = await complete(updatedContext);
+    const result = await updatedContext.complete();
     
     // Verify we got a meaningful response
     expect(result.text).toBeDefined();

@@ -266,24 +266,24 @@ describe("MemoryContext Integration Tests", () => {
     expect(memoryContext).toBeDefined();
 
     // Verify context structure
-    const context = memoryContext.getContext();
-    expect(context.prompt).toBeDefined();
-    expect(context.messages).toBeDefined();
-    expect(context.messages.length).toBeGreaterThan(0);
-    expect(context.messages[0].role).toBe("system");
+    expect(memoryContext.prompt).toBeDefined();
+    const messages = memoryContext.getMessages();
+    expect(messages).toBeDefined();
+    expect(messages.length).toBeGreaterThan(0);
+    expect(messages[0].role).toBe("system");
   });
 
   test("should add user messages and extract facts", async () => {
     // Add a user message
-    await memoryContext.addUserMessage(
+    memoryContext = await memoryContext.addUserMessage(
       "I love pizza and want to visit Italy someday"
-    );
+    ) as MemoryContext;
 
     // Verify message was added to context
-    const context = memoryContext.getContext();
-    expect(context.messages.length).toBe(2); // System + user message
-    expect(context.messages[1].role).toBe("user");
-    expect(context.messages[1].content).toBe(
+    const messages = memoryContext.getMessages();
+    expect(messages.length).toBe(2); // System + user message
+    expect(messages[1].role).toBe("user");
+    expect(messages[1].content).toBe(
       "I love pizza and want to visit Italy someday"
     );
 
@@ -312,24 +312,24 @@ describe("MemoryContext Integration Tests", () => {
 
   test("should add assistant responses to memory", async () => {
     // Add assistant response
-    await memoryContext.addAssistantResponse(
+    memoryContext = await memoryContext.addAssistantResponse(
       "I can help you plan your trip to Italy!"
-    );
+    ) as MemoryContext;
 
     // Verify message was added to context
-    const context = memoryContext.getContext();
-    expect(context.messages.length).toBe(2); // System + assistant message
-    expect(context.messages[1].role).toBe("assistant");
-    expect(context.messages[1].content).toBe(
+    const messages = memoryContext.getMessages();
+    expect(messages.length).toBe(2); // System + assistant message
+    expect(messages[1].role).toBe("assistant");
+    expect(messages[1].content).toBe(
       "I can help you plan your trip to Italy!"
     );
   });
 
   test("should enrich context with memories", async () => {
     // First add a message to generate some memories
-    await memoryContext.addUserMessage(
+    memoryContext = await memoryContext.addUserMessage(
       "My name is John and I like programming"
-    );
+    ) as MemoryContext;
 
     // Give the LLM time to process
     await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -355,7 +355,8 @@ describe("MemoryContext Integration Tests", () => {
     const enrichedContext = await memoryContext.enrichContextWithMemories();
 
     // Verify the system message was updated with memories
-    const systemMessage = enrichedContext.messages[0].content as string;
+    const enrichedMessages = enrichedContext.getMessages();
+    const systemMessage = enrichedMessages[0].content as string;
     expect(systemMessage).toContain("I know the following about the user");
     expect(systemMessage).toContain("- "); // Contains at least one memory entry
   }, 30000); // 30 second timeout
@@ -456,23 +457,23 @@ describe("Memory System Workflow Tests", () => {
 
     // Simulate a conversation with multiple turns
     // Turn 1: User introduces themselves
-    await memoryContext.addUserMessage(
+    memoryContext = await memoryContext.addUserMessage(
       "Hi there! My name is Alex and I'm from California."
-    );
-    await memoryContext.addAssistantResponse(
+    ) as MemoryContext;
+    memoryContext = await memoryContext.addAssistantResponse(
       "Nice to meet you, Alex! How can I help you today?"
-    );
+    ) as MemoryContext;
 
     // // Give the LLM time to process
     // await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Turn 2: User shares preferences
-    await memoryContext.addUserMessage(
+    memoryContext = await memoryContext.addUserMessage(
       "I love pizza and coffee. I'm planning to move to New York soon."
-    );
-    await memoryContext.addAssistantResponse(
+    ) as MemoryContext;
+    memoryContext = await memoryContext.addAssistantResponse(
       "That's exciting! New York has great pizza and coffee shops."
-    );
+    ) as MemoryContext;
 
     // // Give the LLM time to process
     // await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -520,8 +521,8 @@ describe("Memory System Workflow Tests", () => {
     expect(factCount).toBeGreaterThanOrEqual(2);
 
     // Check that the context was enriched with memories
-    const context = memoryContext.getContext();
-    const systemPrompt = context.messages[0].content as string;
+    const messages = memoryContext.getMessages();
+    const systemPrompt = messages[0].content as string;
 
     expect(systemPrompt).toContain("I know the following about the user");
   }, 30000); // Set timeout to 30 seconds

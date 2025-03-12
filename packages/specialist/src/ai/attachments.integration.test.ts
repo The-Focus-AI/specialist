@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeAll } from '@jest/globals';
 import { createAttachment } from './attachments.js';
-import { addAttachmentToContext, makeContext, makePrompt } from './context.js';
+import { Context, makePrompt } from './context.js';
 import path from 'path';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
@@ -45,13 +45,14 @@ describe('Attachment Integration Tests', () => {
 
     // Create a basic context
     const imagePrompt = makePrompt('Analyze this image', 'ollama/llava:7b');
-    const imageContext = makeContext(imagePrompt);
+    const imageContext = new Context(imagePrompt);
 
     // Add the image to the context
-    const imageUpdatedContext = addAttachmentToContext(imageContext, imageAttachment);
+    const imageUpdatedContext = await imageContext.addAttachment(imageAttachment);
 
     // Verify the context has the correct structure for models to process
-    const imageUserMessage = imageUpdatedContext.messages[1];
+    const imageMessages = imageUpdatedContext.getMessages();
+    const imageUserMessage = imageMessages[1];
     expect(imageUserMessage.role).toBe('user');
 
     const imageContent = imageUserMessage.content as any[];
@@ -77,13 +78,14 @@ describe('Attachment Integration Tests', () => {
 
     // Create a basic context
     const pdfPrompt = makePrompt('Analyze this PDF', 'ollama/llama3.2');
-    const pdfContext = makeContext(pdfPrompt);
+    const pdfContext = new Context(pdfPrompt);
 
     // Add the PDF to the context
-    const pdfUpdatedContext = addAttachmentToContext(pdfContext, pdfAttachment);
+    const pdfUpdatedContext = await pdfContext.addAttachment(pdfAttachment);
 
     // Verify the context has the correct structure for models to process
-    const pdfUserMessage = pdfUpdatedContext.messages[1];
+    const pdfMessages = pdfUpdatedContext.getMessages();
+    const pdfUserMessage = pdfMessages[1];
     expect(pdfUserMessage.role).toBe('user');
 
     const pdfContent = pdfUserMessage.content as any[];

@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { addAttachmentToContext, Context, makeContext, makePrompt, Prompt } from './context.js';
+import { Context, makePrompt, Prompt } from './context.js';
 import { Attachment } from './attachments.js';
 import { modelFromString } from './models.js';
 import { fileURLToPath } from 'url';
@@ -32,22 +32,24 @@ describe('Context with attachments', () => {
     tools: undefined
   };
   
-  it('should add an image attachment to context', () => {
-    const context = makeContext(testPrompt);
+  it('should add an image attachment to context', async () => {
+    const context = new Context(testPrompt);
     
     // Initial context should have just the system message
-    expect(context.messages.length).toBe(1);
-    expect(context.messages[0].role).toBe('system');
+    const initialMessages = context.getMessages();
+    expect(initialMessages.length).toBe(1);
+    expect(initialMessages[0].role).toBe('system');
     
     // Add an image attachment
-    const updatedContext = addAttachmentToContext(context, mockImageAttachment);
+    const updatedContext = await context.addAttachment(mockImageAttachment);
     
     // Context should now have the system message plus a user message with the attachment
-    expect(updatedContext.messages.length).toBe(2);
-    expect(updatedContext.messages[1].role).toBe('user');
+    const updatedMessages = updatedContext.getMessages();
+    expect(updatedMessages.length).toBe(2);
+    expect(updatedMessages[1].role).toBe('user');
     
     // The user message should have content with both text and the image
-    const content = updatedContext.messages[1].content as any[];
+    const content = updatedMessages[1].content as any[];
     expect(Array.isArray(content)).toBe(true);
     expect(content.length).toBe(2);
     
@@ -61,20 +63,22 @@ describe('Context with attachments', () => {
     expect(content[1].mimeType).toBe(mockImageAttachment.mimeType);
   });
   
-  it('should add a PDF attachment to context', () => {
-    const context = makeContext(testPrompt);
+  it('should add a PDF attachment to context', async () => {
+    const context = new Context(testPrompt);
     
     // Initial context should have just the system message
-    expect(context.messages.length).toBe(1);
+    const initialMessages = context.getMessages();
+    expect(initialMessages.length).toBe(1);
     
     // Add a PDF attachment
-    const updatedContext = addAttachmentToContext(context, mockPdfAttachment);
+    const updatedContext = await context.addAttachment(mockPdfAttachment);
     
     // Context should now have the system message plus a user message with the attachment
-    expect(updatedContext.messages.length).toBe(2);
+    const updatedMessages = updatedContext.getMessages();
+    expect(updatedMessages.length).toBe(2);
     
     // The user message should have content with both text and the PDF
-    const content = updatedContext.messages[1].content as any[];
+    const content = updatedMessages[1].content as any[];
     expect(Array.isArray(content)).toBe(true);
     expect(content.length).toBe(2);
     
@@ -88,15 +92,15 @@ describe('Context with attachments', () => {
     expect(content[1].mimeType).toBe(mockPdfAttachment.mimeType);
   });
   
-  it('should not mutate the original context when adding an attachment', () => {
-    const originalContext = makeContext(testPrompt);
-    const messagesBeforeLength = originalContext.messages.length;
+  it('should not mutate the original context when adding an attachment', async () => {
+    const originalContext = new Context(testPrompt);
+    const messagesBeforeLength = originalContext.getMessages().length;
     
     // Add an attachment
-    const updatedContext = addAttachmentToContext(originalContext, mockImageAttachment);
+    const updatedContext = await originalContext.addAttachment(mockImageAttachment);
     
     // Original context should be unchanged
-    expect(originalContext.messages.length).toBe(messagesBeforeLength);
+    expect(originalContext.getMessages().length).toBe(messagesBeforeLength);
     expect(originalContext).not.toBe(updatedContext);
   });
 });
