@@ -12,4 +12,6 @@ export const app = subcommands({
   },
 });
 
+console.log(process.argv.slice(2));
+
 run(app, process.argv.slice(2));

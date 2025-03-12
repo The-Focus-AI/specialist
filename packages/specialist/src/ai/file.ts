@@ -14,14 +14,17 @@ export async function addFileToContext(
 
   const filePath = path.resolve(file);
 
-  if (existsSync(filePath)) {
-    console.log(`[File] ${filePath}`);
+  if (!existsSync(filePath)) {
+    throw new Error(`File not found: ${filePath}`);
+  }
 
+  try {
     // Create attachment from file
     const attachment = await createAttachment(filePath);
     // Add attachment to context
     return await context.addAttachment(attachment);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to process file ${filePath}: ${errorMessage}`);
   }
-
-  return context;
 }

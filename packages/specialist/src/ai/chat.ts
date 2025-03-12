@@ -329,7 +329,7 @@ export async function interactiveChat(context: Context | MemoryContext) {
         break;
       } else if (response === "?") {
         // Display context info
-        console.log(context);
+        console.log(JSON.stringify(context, null, 2));
       } else if (useMemory && response === "?m") {
         // Display memories (memory context only)
         const memories = (context as MemoryContext).getMemories();
@@ -358,14 +358,19 @@ export async function interactiveChat(context: Context | MemoryContext) {
           console.log(`Processing file: ${response.substring(5).trim()}`);
           const filePath = response.substring(5).trim();
 
-          const attachment = await createAttachment(filePath);
+          try {
+            const attachment = await createAttachment(filePath);
 
-          context = await context.addFileMessage(
-            attachment.base64Data,
-            attachment.mimeType,
-            attachment.filename
-          );
-          console.log("File added to context");
+            context = await context.addFileMessage(
+              attachment.base64Data,
+              attachment.mimeType,
+              attachment.filename
+            );
+            console.log("File added to context");
+          } catch (error) {
+            console.error("Error processing file:", error);
+            continue;
+          }
         }
 
         try {

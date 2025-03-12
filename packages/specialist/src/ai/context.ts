@@ -78,15 +78,20 @@ export class Context {
     // Create a new context instance to avoid mutation
     const newContext = this.clone();
 
-    // Add the attachment as a user message
+    const content = attachmentToContent(attachment);
+    const isImage = content.type === "image";
+
+    // Add the attachment as a user message with appropriate description
     newContext._messages.push({
       role: "user",
       content: [
         {
           type: "text",
-          text: `I've attached a file named ${attachment.filename} for you to analyze.`,
+          text: isImage
+            ? `I've shared an image named ${attachment.filename} for you to analyze.`
+            : `I've shared a PDF document named ${attachment.filename} for you to analyze. Please read through it and help me understand its contents.`,
         },
-        attachmentToContent(attachment),
+        content,
       ],
     });
 

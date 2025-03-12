@@ -54,7 +54,14 @@ export const chatCommand = command({
     }
 
     if (file) {
-      await addFileToContext(context, file);
+      try {
+        console.log("[File] Processing:", file);
+        context = await addFileToContext(context, file);
+        console.log("[File] Successfully added to context");
+      } catch (error) {
+        console.error("[File] Error processing file:", error);
+        process.exit(1);
+      }
     }
 
     // Start interactive chat (with or without memory)
