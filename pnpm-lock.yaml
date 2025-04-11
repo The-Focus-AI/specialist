@@ -43,6 +43,37 @@ importers:
         specifier: ^5.8.2
         version: 5.8.2
 
+  packages/barista:
+    dependencies:
+      '@specialist/core':
+        specifier: workspace:*
+        version: link:../specialist
+      ai:
+        specifier: ^4.1.51
+        version: 4.1.51(react@19.0.0)(zod@3.24.2)
+      cmd-ts:
+        specifier: ^0.13.0
+        version: 0.13.0
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
+    devDependencies:
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
+      '@types/jest':
+        specifier: ^29.5.14
+        version: 29.5.14
+      jest:
+        specifier: ^29.7.0
+        version: 29.7.0(@types/node@22.13.9)(ts-node@10.9.2(@types/node@22.13.9)(typescript@5.8.2))
+      jest-environment-jsdom:
+        specifier: ^29.7.0
+        version: 29.7.0
+      ts-jest:
+        specifier: ^29.2.6
+        version: 29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.13.9)(ts-node@10.9.2(@types/node@22.13.9)(typescript@5.8.2)))(typescript@5.8.2)
+
   packages/penguin:
     dependencies:
       '@specialist/core':

@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "../../",
+    "baseUrl": ".",
+    "declaration": true,
+    "composite": true,
+    "paths": {
+      "@specialist/core/*": ["../specialist/src/*"]
+    }
+  },
+  "include": ["src/**/*", "../specialist/src/ai/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../specialist" }
+  ]
+}

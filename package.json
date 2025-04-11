@@ -14,7 +14,8 @@
     "dev:penguin": "pnpm --filter @specialist/penguin dev",
     "dev": "tsx index.ts",
     "specialist": "pnpm --filter @specialist/core run dev",
-    "penguin": "pnpm --filter @specialist/penguin run dev"
+    "penguin": "pnpm --filter @specialist/penguin run dev",
+    "barista": "pnpm --filter @specialist/barista run dev"
   },
   "keywords": [],
   "author": "",
